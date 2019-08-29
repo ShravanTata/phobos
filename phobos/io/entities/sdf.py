@@ -51,6 +51,7 @@ jointmapping = {
     'continuous': 'revolute',
     'prismatic': 'prismatic',
     'fixed': 'fixed',
+    'spherical': 'spherical',
     'floating': 'TODO',
     'planar': 'TODO',
 }

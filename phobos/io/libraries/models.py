@@ -91,6 +91,10 @@ def compileModelList():
     except KeyError:
         log('Can not create mechanism preview. Phobos not registered.', 'DEBUG')
         return
+    except AttributeError:
+        rootpath = ''
+        log('Rootpath not found!', 'DEBUG')
+        return
 
     if rootpath == '' or not os.path.exists(rootpath):
         log('Model library folder does not exist.')

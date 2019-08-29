@@ -1463,6 +1463,10 @@ class DefineJointConstraintsOperator(Operator):
     bl_label = "Define Joint(s)"
     bl_options = {'REGISTER', 'UNDO'}
 
+    axis = FloatVectorProperty(
+        name='Axis', default=[0., 1., 0.], description='Axis of the joint'
+    )
+
     passive = BoolProperty(
         name='Passive', default=False, description='Make the joint passive (no actuation)'
     )
@@ -1532,6 +1536,7 @@ class DefineJointConstraintsOperator(Operator):
                 else:
                     layout.prop(self, "maxvelocity", text="max velocity [m/s]")
             if self.joint_type in ('revolute', 'prismatic'):
+                layout.prop(self, "axis", text="axis")
                 layout.prop(self, "lower", text="lower [rad]" if self.useRadian else "lower [°]")
                 layout.prop(self, "upper", text="upper [rad]" if self.useRadian else "upper [°]")
                 layout.prop(self, "spring", text="spring constant [N/m]")
@@ -1585,8 +1590,8 @@ class DefineJointConstraintsOperator(Operator):
         for joint in (obj for obj in context.selected_objects if obj.phobostype == 'link'):
             context.scene.objects.active = joint
             jUtils.setJointConstraints(
-                joint, self.joint_type, lower, upper, self.spring, self.damping
-            )
+                joint, self.joint_type, lower, upper, self.spring, self.damping,
+                axis=self.axis)
 
             # TODO is this still needed? Or better move it to the utility function
             if self.joint_type != 'fixed':

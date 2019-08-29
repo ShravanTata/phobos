@@ -225,7 +225,7 @@ def getJointConstraint(joint, ctype):
 
     """
     con = None
-    for c in joint.pose.bones[0].constraints:
+    for c in joint.pose.bones[0].constraints: 
         if c.type == ctype:
             con = c
     return con
@@ -241,6 +241,7 @@ def setJointConstraints(
     damping=0.0,
     maxeffort_approximation=None,
     maxspeed_approximation=None,
+    axis=[-1., 0., 0.]
 ):
     """Sets the constraints for a given joint and jointtype.
     
@@ -295,7 +296,9 @@ def setJointConstraints(
 
     # set constraints accordingly
     if jointtype == 'revolute':
-        set_revolute(joint, lower, upper)
+        set_revolute(joint, lower, upper, axis)
+    elif jointtype == 'spherical':
+        set_spherical(joint, axis)
     elif jointtype == 'continuous':
         set_continuous(joint)
     elif jointtype == 'prismatic':
@@ -389,6 +392,9 @@ def getJointType(joint):
             jtype = 'prismatic'
         elif ncloc == 1:
             jtype = 'planar'
+    if ncrot is None:
+        jtype = 'spherical'
+    print(ncloc, ncrot, jtype)
     return jtype, crot
 
 
@@ -436,8 +442,40 @@ def deriveJointState(joint):
     # TODO: hard-coding this could prove problematic if we at some point build armatures from multiple bones
     return state
 
+def set_spherical(joint, axis):
+    """
 
-def set_revolute(joint, lower, upper):
+    Args:
+      joint: 
+
+    Returns:
+
+    """
+    # fix location
+    bpy.ops.pose.constraint_add(type='LIMIT_LOCATION')
+    cloc = getJointConstraint(joint, 'LIMIT_LOCATION')
+    cloc.use_min_x = True
+    cloc.use_min_y = True
+    cloc.use_min_z = True
+    cloc.use_max_x = True
+    cloc.use_max_y = True
+    cloc.use_max_z = True
+    cloc.owner_space = 'LOCAL'
+    # free all rotations
+    # bpy.ops.pose.constraint_add(type='LIMIT_ROTATION')
+    # crot = getJointConstraint(joint, 'LIMIT_ROTATION')
+    # crot.use_limit_x = False
+    # crot.use_limit_y = False
+    # crot.use_limit_z = False
+    # crot.owner_space = 'LOCAL'
+    #: Set the axis of rotation
+    _axis_unit = mathutils.Vector(axis)
+    _bone_unit = (joint.pose.bones[0].head - joint.pose.bones[0].tail).normalized()
+    joint.rotation_mode = 'QUATERNION'
+    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
+
+
+def set_revolute(joint, lower, upper, axis):
     """
 
     Args:
@@ -471,7 +509,11 @@ def set_revolute(joint, lower, upper):
     crot.min_z = 0
     crot.max_z = 0
     crot.owner_space = 'LOCAL'
-
+    #: Set the axis of rotation
+    _axis_unit = mathutils.Vector(axis)
+    _bone_unit = (joint.pose.bones[0].head - joint.pose.bones[0].tail).normalized()
+    joint.rotation_mode = 'QUATERNION'
+    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
 
 def set_continuous(joint):
     """

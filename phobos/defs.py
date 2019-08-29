@@ -73,6 +73,7 @@ phobostypes = (
 
 jointtypes = (
     ('revolute',) * 3,
+    ('spherical',) * 3,
     ('continuous',) * 3,
     ('prismatic',) * 3,
     ('fixed',) * 3,
