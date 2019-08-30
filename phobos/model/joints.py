@@ -241,7 +241,7 @@ def setJointConstraints(
     damping=0.0,
     maxeffort_approximation=None,
     maxspeed_approximation=None,
-    axis=[-1., 0., 0.]
+    axis=[0., 0., 1.]
 ):
     """Sets the constraints for a given joint and jointtype.
     
