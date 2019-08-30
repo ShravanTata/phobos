@@ -131,7 +131,8 @@ def createJoint(joint, linkobj=None, links=None):
         log("Joint limits upper/lower is missing! Defaulted both to [-1e-5, 1e-5].", 'WARNING')
         lower = -1e-5
         upper = 1e-5
-    setJointConstraints(linkobj, joint['type'], lower, upper)
+    print(axis[:])
+    setJointConstraints(linkobj, joint['type'], lower, upper, axis=axis)
 
     # add generic properties
     for prop in joint:
@@ -300,11 +301,11 @@ def setJointConstraints(
     elif jointtype == 'spherical':
         set_spherical(joint, axis)
     elif jointtype == 'continuous':
-        set_continuous(joint)
+        set_continuous(joint, axis)
     elif jointtype == 'prismatic':
-        set_prismatic(joint, lower, upper)
+        set_prismatic(joint, lower, upper, axis)
     elif jointtype == 'fixed':
-        set_fixed(joint)
+        set_fixed(joint, axis)
     elif jointtype == 'floating':
         # 6DOF
         pass
@@ -470,7 +471,7 @@ def set_spherical(joint, axis):
     # crot.owner_space = 'LOCAL'
     #: Set the axis of rotation
     _axis_unit = mathutils.Vector(axis)
-    _bone_unit = (joint.pose.bones[0].head - joint.pose.bones[0].tail).normalized()
+    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
     joint.rotation_mode = 'QUATERNION'
     joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
 
@@ -511,11 +512,11 @@ def set_revolute(joint, lower, upper, axis):
     crot.owner_space = 'LOCAL'
     #: Set the axis of rotation
     _axis_unit = mathutils.Vector(axis)
-    _bone_unit = (joint.pose.bones[0].head - joint.pose.bones[0].tail).normalized()
+    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
     joint.rotation_mode = 'QUATERNION'
     joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
 
-def set_continuous(joint):
+def set_continuous(joint, axis):
     """
 
     Args:
@@ -544,9 +545,14 @@ def set_continuous(joint):
     crot.min_z = 0
     crot.max_z = 0
     crot.owner_space = 'LOCAL'
+    #: Set the axis of rotation
+    _axis_unit = mathutils.Vector(axis)
+    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
+    joint.rotation_mode = 'QUATERNION'
+    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
 
 
-def set_prismatic(joint, lower, upper):
+def set_prismatic(joint, lower, upper, axis):
     """
 
     Args:
@@ -586,9 +592,14 @@ def set_prismatic(joint, lower, upper):
     crot.min_z = 0
     crot.max_z = 0
     crot.owner_space = 'LOCAL'
+    #: Set the axis of rotation
+    _axis_unit = mathutils.Vector(axis)
+    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
+    joint.rotation_mode = 'QUATERNION'
+    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
 
 
-def set_fixed(joint):
+def set_fixed(joint, axis):
     """
 
     Args:
@@ -620,6 +631,11 @@ def set_fixed(joint):
     crot.min_z = 0
     crot.max_z = 0
     crot.owner_space = 'LOCAL'
+    #: Set the axis of rotation
+    _axis_unit = mathutils.Vector(axis)
+    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
+    joint.rotation_mode = 'QUATERNION'
+    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
 
 
 def set_planar(joint):

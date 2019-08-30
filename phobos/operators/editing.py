@@ -1464,7 +1464,7 @@ class DefineJointConstraintsOperator(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     axis = FloatVectorProperty(
-        name='Axis', default=[0., 1., 0.], description='Axis of the joint'
+        name='Axis', default=[0., 0., 1.], description='Axis of the joint'
     )
 
     passive = BoolProperty(
@@ -1535,12 +1535,13 @@ class DefineJointConstraintsOperator(Operator):
                     )
                 else:
                     layout.prop(self, "maxvelocity", text="max velocity [m/s]")
-            if self.joint_type in ('revolute', 'prismatic'):
-                layout.prop(self, "axis", text="axis")
+            if self.joint_type in ('revolute', 'prismatic'):                
                 layout.prop(self, "lower", text="lower [rad]" if self.useRadian else "lower [°]")
                 layout.prop(self, "upper", text="upper [rad]" if self.useRadian else "upper [°]")
                 layout.prop(self, "spring", text="spring constant [N/m]")
                 layout.prop(self, "damping", text="damping constant")
+        if not self.joint_type == 'planar':
+            layout.prop(self, "axis", text="axis")
 
     def invoke(self, context, event):
         """
