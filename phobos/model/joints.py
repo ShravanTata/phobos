@@ -295,6 +295,17 @@ def setJointConstraints(
             'joint/dynamics/damping_const_constraint_axis1'
         ] = damping  # FIXME: this is a hack, too
 
+    #: Set the axis of rotation
+    _axis_unit = mathutils.Vector(axis)
+    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
+    #: Get rotation matrix
+    _mat = (_axis_unit.rotation_difference(_bone_unit)).to_matrix()
+    bpy.ops.object.mode_set(mode='EDIT')
+    _arm = joint.data
+    _bone = _arm.edit_bones['Bone']
+    _bone.tail = _mat*_bone.tail
+    bpy.ops.object.mode_set(mode='POSE')
+
     # set constraints accordingly
     if jointtype == 'revolute':
         set_revolute(joint, lower, upper, axis)
@@ -509,12 +520,7 @@ def set_revolute(joint, lower, upper, axis):
     crot.use_limit_z = True
     crot.min_z = 0
     crot.max_z = 0
-    crot.owner_space = 'LOCAL'
-    #: Set the axis of rotation
-    _axis_unit = mathutils.Vector(axis)
-    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
-    joint.rotation_mode = 'QUATERNION'
-    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
+    crot.owner_space = 'LOCAL'    
 
 def set_continuous(joint, axis):
     """
@@ -545,11 +551,6 @@ def set_continuous(joint, axis):
     crot.min_z = 0
     crot.max_z = 0
     crot.owner_space = 'LOCAL'
-    #: Set the axis of rotation
-    _axis_unit = mathutils.Vector(axis)
-    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
-    joint.rotation_mode = 'QUATERNION'
-    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
 
 
 def set_prismatic(joint, lower, upper, axis):
@@ -592,11 +593,6 @@ def set_prismatic(joint, lower, upper, axis):
     crot.min_z = 0
     crot.max_z = 0
     crot.owner_space = 'LOCAL'
-    #: Set the axis of rotation
-    _axis_unit = mathutils.Vector(axis)
-    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
-    joint.rotation_mode = 'QUATERNION'
-    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
 
 
 def set_fixed(joint, axis):
@@ -631,12 +627,6 @@ def set_fixed(joint, axis):
     crot.min_z = 0
     crot.max_z = 0
     crot.owner_space = 'LOCAL'
-    #: Set the axis of rotation
-    _axis_unit = mathutils.Vector(axis)
-    _bone_unit = (joint.pose.bones[0].tail - joint.pose.bones[0].head).normalized()
-    joint.rotation_mode = 'QUATERNION'
-    joint.rotation_quaternion = _axis_unit.rotation_difference(_bone_unit)
-
 
 def set_planar(joint):
     """
